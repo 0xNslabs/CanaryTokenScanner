@@ -37,7 +37,7 @@ To effectively utilize the script:
 
 ### Script Showcase
 
-![Canary Token Scanner in Action](demo.png)
+![Canary Token Scanner in Action](https://raw.githubusercontent.com/0xNslabs/CanaryTokenDetector/main/demo.png)
 *An example of the Canary Token Scanner script in action, demonstrating its capability to detect suspicious URLs.*
 
 ### Disclaimer
