@@ -14,10 +14,16 @@ def decompress_and_scan(file_path):
     is_suspicious = False
     temp_dir = "temp_extracted"
     os.makedirs(temp_dir, exist_ok=True)
-    
+
     try:
-        with zipfile.ZipFile(file_path + ".zip", 'r') as zip_ref:
-            zip_ref.extractall(temp_dir)
+        if file_path.endswith('.zip'):
+            with zipfile.ZipFile(file_path, 'r') as zip_ref:
+                zip_ref.extractall(temp_dir)
+        else:
+            temp_zip_path = os.path.join(temp_dir, "temp.zip")
+            shutil.copyfile(file_path, temp_zip_path)
+            with zipfile.ZipFile(temp_zip_path, 'r') as zip_ref:
+                zip_ref.extractall(temp_dir)
 
         url_pattern = re.compile(r'https?://\S+')
         ignored_domains = ['schemas.openxmlformats.org', 'schemas.microsoft.com', 'purl.org', 'w3.org']
