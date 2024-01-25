@@ -1,15 +1,15 @@
 # Canary Token Scanner
 
-## Detecting Canary Tokens and Suspicious URLs in Microsoft Office and Zip Files
+## Detecting Canary Tokens and Suspicious URLs in Microsoft Office, Acrobat Reader PDF and Zip Files
 
 ### Introduction
 
-In the dynamic realm of cybersecurity, vigilance and proactive defense are key. Malicious actors often leverage Microsoft Office files and Zip archives, embedding covert URLs or macros to initiate harmful actions. This Python script is crafted to detect potential threats by scrutinizing the contents of Microsoft Office documents and Zip files, reducing the risk of inadvertently triggering malicious code.
+In the dynamic realm of cybersecurity, vigilance and proactive defense are key. Malicious actors often leverage Microsoft Office files and Zip archives, embedding covert URLs or macros to initiate harmful actions. This Python script is crafted to detect potential threats by scrutinizing the contents of Microsoft Office documents, Acrobat Reader PDF documents and Zip files, reducing the risk of inadvertently triggering malicious code.
 
 ### Understanding the Script
 
 #### Identification
-The script smartly identifies Microsoft Office documents (.docx, .xlsx, .pptx) and Zip files. These file types, including Office documents, are zip archives that can be examined programmatically.
+The script smartly identifies Microsoft Office documents (.docx, .xlsx, .pptx), Acrobat Reader PDF documents (.pdf) and Zip files. These file types, including Office documents, are zip archives that can be examined programmatically.
 
 #### Decompression and Scanning
 For both Office and Zip files, the script decompresses the contents into a temporary directory. It then scans these contents for URLs using regular expressions, searching for potential signs of compromise.
