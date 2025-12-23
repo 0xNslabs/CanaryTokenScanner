@@ -1,45 +1,76 @@
-# Canary Token Scanner
+# CanaryToken / HoneyToken Scanner
 
-## Detecting Canary Tokens and Suspicious URLs in Microsoft Office, Acrobat Reader PDF and Zip Files
+Detect suspicious URLs (including CanaryTokens) inside **Microsoft Office documents** and **PDFs**.
 
-### Introduction
+Supported formats:
+- Office Open XML: **.docx, .xlsx, .pptx**
+- **.pdf**
+- **.zip** (generic archives)
 
-In the dynamic realm of cybersecurity, vigilance and proactive defense are key. Malicious actors often leverage Microsoft Office files and Zip archives, embedding covert URLs or macros to initiate harmful actions. This Python script is crafted to detect potential threats by scrutinizing the contents of Microsoft Office documents, Acrobat Reader PDF documents and Zip files, reducing the risk of inadvertently triggering malicious code.
+## Why this exists
 
-### Understanding the Script
+CanaryTokens an HoneyTokens (and other tracking or malicious URLs) are often embedded in documents to signal when a file is opened or when an external resource is fetched. This tool performs **static inspection only**: it reads file contents and looks for embedded URLs **without opening the document in Office/Acrobat** and without making any network requests.
 
-#### Identification
-The script smartly identifies Microsoft Office documents (.docx, .xlsx, .pptx), Acrobat Reader PDF documents (.pdf) and Zip files. These file types, including Office documents, are zip archives that can be examined programmatically.
+## How it works
 
-#### Decompression and Scanning
-For both Office and Zip files, the script decompresses the contents into a temporary directory. It then scans these contents for URLs using regular expressions, searching for potential signs of compromise.
+### Office / Zip scanning (DOCX/XLSX/PPTX/ZIP)
+- Office documents are ZIP containers under the hood.
+- The scanner reads ZIP members **directly** and searches for `http://` and `https://` URLs.
+- Common, expected schema domains are ignored to reduce noise:
+  - `schemas.openxmlformats.org`
+  - `schemas.microsoft.com`
+  - `purl.org`
+  - `w3.org`
 
-#### Ignoring Certain URLs
-To minimize false positives, the script includes a list of domains to ignore, filtering out common URLs typically found in Office documents. This ensures focused analysis on unusual or potentially harmful URLs.
+### PDF scanning
+The scanner searches for URLs in:
+- Raw PDF bytes (many PDFs store URLs plainly in `/URI(...)`)
+- Compressed PDF streams (`stream ... endstream`) by attempting Flate/deflate decompression
 
-#### Flagging Suspicious Files
-Files with URLs not on the ignored list are marked as suspicious. This heuristic method allows for adaptability based on your specific security context and threat landscape.
+### Output
+- If suspicious URLs are found, the script prints them and reports the file as suspicious.
+- If nothing interesting is found, the file is reported as normal.
 
-#### Cleanup and Restoration
-Post-scanning, the script cleans up by erasing temporary decompressed files, leaving no traces.
+## Usage
 
-### Usage
+Run against a single file:
 
-To effectively utilize the script:
+```bash
+python CanaryTokenScanner.py /path/to/document.pdf
+```
 
-1. **Setup**
-   - Ensure Python is installed on your system.
-   - Position the script in an accessible location.
-   - Execute the script with the command: `python CanaryTokenScanner.py FILE_OR_DIRECTORY_PATH` (Replace `FILE_OR_DIRECTORY_PATH` with the actual file or directory path.)
+Run against a directory (recursive):
 
-2. **Interpretation**
-   - Examine the output. Remember, this script is a starting point; flagged documents might not be harmful, and not all malicious documents will be flagged. Manual examination and additional security measures are advisable.
+```bash
+python CanaryTokenScanner.py /path/to/folder
+```
 
-### Script Showcase
+Example output:
+
+```text
+URL Found in /path/to/file.docx:
+https://example.com/track/abc123
+
+The file /path/to/file.docx is suspicious.
+```
+
+## V2: What changed (performance + improvements)
+
+- **No more extraction to disk**: Office/ZIP files are scanned in-memory instead of being extracted to a temporary directory.
+- **Faster scans**: avoids filesystem overhead and repeated reads.
+- **Better PDF coverage**: detects URLs in both raw PDF content and Flate/deflate-compressed streams.
+- **Cleaner results**: still filters common schema domains to reduce false positives.
+
+## Notes / limitations
+
+- This is a heuristic URL detector. A URL being present does not automatically mean it is malicious.
+- Some PDFs use compression/filter combinations not covered by simple Flate/deflate decompression.
+- Encrypted or heavily obfuscated files may reduce detection accuracy.
+
+## Script showcase
 
 ![Canary Token Scanner in Action](https://raw.githubusercontent.com/0xNslabs/CanaryTokenDetector/main/demo.png)
-*An example of the Canary Token Scanner script in action, demonstrating its capability to detect suspicious URLs.*
 
-### Disclaimer
+## Disclaimer
 
-This script is intended for educational and security testing purposes only. Utilize it responsibly and in compliance with applicable laws and regulations.
+This script is intended for educational and security testing purposes only. Use it responsibly and in compliance with applicable laws and organizational policies. The author(s) assume no liability for misuse or for actions taken based on the output of this tool.
